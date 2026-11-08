@@ -31,6 +31,10 @@ end
 --- Downloads the tmux release tarball (and libevent unless the system one is
 --- used) to a temporary directory and builds them into the install dir.
 ---
+--- The version is a release (3.8), or "ref:<git ref>" (ref:master,
+--- ref:<commit sha>) to build any branch, tag or commit from the git source,
+--- which needs autoconf, automake and bison.
+---
 --- Tool options (mise.toml):
 ---   configure_options          tmux configure args (default "--disable-utf8proc")  TMUX_EXTRA_CONFIGURE_OPTIONS
 ---   libevent_version           bundled libevent version (default "2.1.12"),
@@ -60,11 +64,19 @@ function PLUGIN:PostInstall(ctx)
     -- Note: pcall cannot wrap http.* calls in mise's Lua runtime, so cleanup
     -- is done explicitly on download errors and by a shell trap below.
     local work = cmd.exec("mktemp -d"):gsub("%s+$", "")
-    download(
-        "https://github.com/tmux/tmux/releases/download/" .. version .. "/tmux-" .. version .. ".tar.gz",
-        file.join_path(work, "tmux.tar.gz"),
-        work
-    )
+    local ref = version:match("^ref:(.+)$")
+    local tmux_url
+    if ref then
+        -- tmux@ref:<branch|tag|commit>: GitHub source archive (needs autogen.sh)
+        if not ref:match("^[%w%._/-]+$") then
+            cmd.exec("rm -rf " .. sh_quote(work))
+            error("invalid git ref: " .. ref)
+        end
+        tmux_url = "https://github.com/tmux/tmux/archive/" .. ref .. ".tar.gz"
+    else
+        tmux_url = "https://github.com/tmux/tmux/releases/download/" .. version .. "/tmux-" .. version .. ".tar.gz"
+    end
+    download(tmux_url, file.join_path(work, "tmux.tar.gz"), work)
     if bundle_libevent then
         download(
             "https://github.com/libevent/libevent/releases/download/release-"
@@ -103,6 +115,9 @@ function PLUGIN:PostInstall(ctx)
     print("Building tmux " .. version .. " (configure " .. config .. ", make -j " .. jobs .. ")")
     table.insert(lines, "mkdir tmux && tar -xzf tmux.tar.gz -C tmux --strip-components=1")
     table.insert(lines, "cd tmux")
+    if ref then
+        table.insert(lines, "run_step tmux-autogen.log sh autogen.sh")
+    end
     table.insert(lines, "run_step tmux-configure.log env " .. tmux_env .. "./configure --prefix=" .. q_prefix .. " " .. config)
     table.insert(lines, "run_step tmux-make.log make -j " .. jobs)
     table.insert(lines, "run_step tmux-install.log make install")

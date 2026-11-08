@@ -28,6 +28,16 @@ tmux = "latest"
 tmux = { version = "3.8", libevent_version = "system", configure_options = "--enable-utf8proc" }
 ```
 
+リリース以外のブランチ・タグ・コミットは `ref:` を付けて指定できます（GitHub のソースアーカイブから `autogen.sh` を実行してビルド）。
+
+```sh
+mise install tmux@ref:master
+mise install tmux@ref:<commit sha>
+```
+
+この場合は `autoconf`、`automake`、`bison` も必要です（optional として宣言）。
+`ref:master` は1つのバージョンとして扱われ、master が進んでも自動では更新されません。最新にするには `mise install -f tmux@ref:master` で入れ直してください。
+
 | オプション | 既定値 | 内容 | asdf 版での対応 |
 | --- | --- | --- | --- |
 | `configure_options` | `--disable-utf8proc` | tmux の configure 引数（指定すると既定値は置き換わる） | `TMUX_EXTRA_CONFIGURE_OPTIONS` |

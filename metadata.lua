@@ -33,4 +33,8 @@ PLUGIN.systemDependencies = {
         optional = "libevent_version = \"system\"",
         packages = { apt = "libevent-dev", dnf = "libevent-devel", zypper = "libevent-devel", pacman = "libevent", apk = "libevent-dev", brew = "libevent" },
     },
+    -- Only needed to build from a git ref (tmux@ref:master): autogen.sh and the parser.
+    { bin = "autoconf", optional = "tmux@ref:...", packages = { apt = "autoconf", dnf = "autoconf", zypper = "autoconf", pacman = "autoconf", apk = "autoconf", brew = "autoconf" } },
+    { bin = "automake", optional = "tmux@ref:...", packages = { apt = "automake", dnf = "automake", zypper = "automake", pacman = "automake", apk = "automake", brew = "automake" } },
+    { bin = "bison", optional = "tmux@ref:...", packages = { apt = "bison", dnf = "bison", zypper = "bison", pacman = "bison", apk = "bison", brew = "bison" } },
 }
