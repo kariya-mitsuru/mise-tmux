@@ -37,6 +37,7 @@ end
 ---
 --- Tool options (mise.toml):
 ---   configure_options          tmux configure args (default "--disable-utf8proc")  TMUX_EXTRA_CONFIGURE_OPTIONS
+---   extra_configure_options    appended after configure_options (or its default)
 ---   libevent_version           bundled libevent version (default "2.1.12"),
 ---                              or "system" to link the system libevent
 ---   libevent_configure_options libevent configure args (default "--disable-openssl")  LIBEVENT_EXTRA_CONFIGURE_OPTIONS
@@ -47,6 +48,10 @@ function PLUGIN:PostInstall(ctx)
     local options = ctx.options or {}
 
     local config = opt(options, "configure_options") or DEFAULT_CONFIG
+    local extra = opt(options, "extra_configure_options")
+    if extra then
+        config = config .. " " .. extra
+    end
     local libevent_version = opt(options, "libevent_version") or DEFAULT_LIBEVENT_VERSION
     local libevent_config = opt(options, "libevent_configure_options") or DEFAULT_LIBEVENT_CONFIG
     local bundle_libevent = libevent_version ~= "system"

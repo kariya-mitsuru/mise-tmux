@@ -26,6 +26,9 @@ tmux = "latest"
 
 # オプションを指定する場合
 tmux = { version = "3.8", libevent_version = "system", configure_options = "--enable-utf8proc" }
+
+# 既定値に引数を追加する場合（sixel サポートなど）
+tmux = { version = "latest", extra_configure_options = "--enable-sixel" }
 ```
 
 リリース以外のブランチ・タグ・コミットは `ref:` を付けて指定できます（GitHub のソースアーカイブから `autogen.sh` を実行してビルド）。
@@ -41,6 +44,7 @@ mise install tmux@ref:<commit sha>
 | オプション | 既定値 | 内容 | asdf 版での対応 |
 | --- | --- | --- | --- |
 | `configure_options` | `--disable-utf8proc` | tmux の configure 引数（指定すると既定値は置き換わる） | `TMUX_EXTRA_CONFIGURE_OPTIONS` |
+| `extra_configure_options` | なし | `configure_options`（または既定値）の後ろに追加する tmux の configure 引数 | なし |
 | `libevent_version` | `2.1.12` | 同梱する libevent のバージョン。`system` にするとシステムの libevent を使う | なし（2.1.12 固定） |
 | `libevent_configure_options` | `--disable-openssl` | libevent の configure 引数 | `LIBEVENT_EXTRA_CONFIGURE_OPTIONS` |
 | `jobs` | `nproc` | `make -j` の並列数 | `ASDF_CONCURRENCY` |
